@@ -39,13 +39,12 @@ func NewService(store Store) *Service {
 }
 
 func (s *Service) GetComment(ctx context.Context, id string) (Comment, error) {
-	fmt.Println("Getting comment")
 	comment, err := s.Store.GetComment(ctx, id)
 	if err != nil {
 		fmt.Println(err)
 		return Comment{}, err
 	}
-
+	fmt.Printf("Getting comment witd id: %s", id)
 	return comment, nil
 }
 
@@ -55,6 +54,7 @@ func (s *Service) UpdateComment(ctx context.Context, id string, comment Comment)
 		println(err)
 		return Comment{}, err
 	}
+	fmt.Printf("Updating comment witd id: %s", id)
 	return cmt, nil
 }
 
@@ -64,15 +64,17 @@ func (s *Service) DeleteComment(ctx context.Context, id string) error {
 		fmt.Println(err)
 		return err
 	}
+	fmt.Printf("Deleting comment witd id: %s", id)
 	return nil
 }
 
 func (s *Service) PostComment(ctx context.Context, comment Comment) (Comment, error) {
-	fmt.Println("posting comment")
+	fmt.Printf("posting comment")
 	comment, err := s.Store.PostComment(ctx, comment)
 	if err != nil {
 		fmt.Println(err)
 		return Comment{}, err
 	}
+	fmt.Printf("Posting comment witd id: %v", comment)
 	return comment, nil
 }
