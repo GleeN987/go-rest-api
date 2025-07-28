@@ -7,8 +7,23 @@ import (
 	"net/http"
 
 	"github.com/GleeN987/go-rest-api/internal/comment"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
+
+type PostCommentRequest struct {
+	Slug   string `json:"slug" validate:"required"`
+	Body   string `json:"body" validate:"required"`
+	Author string `json:"author" validate:"required"`
+}
+
+func PostCommentRequestToComment(r PostCommentRequest) comment.Comment {
+	return comment.Comment{
+		Slug:   r.Slug,
+		Body:   r.Body,
+		Author: r.Author,
+	}
+}
 
 type CommentService interface {
 	GetComment(ctx context.Context, id string) (comment.Comment, error)
@@ -18,17 +33,25 @@ type CommentService interface {
 }
 
 func (h *Handler) PostComment(w http.ResponseWriter, r *http.Request) {
-	var cmt comment.Comment
-	if err := json.NewDecoder(r.Body).Decode(&cmt); err != nil {
+	var cmtRequest PostCommentRequest
+	if err := json.NewDecoder(r.Body).Decode(&cmtRequest); err != nil {
 		log.Printf("Error while decoding request body: %v", err)
 		return
 	}
-	cmt, err := h.Service.PostComment(r.Context(), cmt)
+
+	validate := validator.New()
+	err := validate.Struct(cmtRequest)
+	if err != nil {
+		http.Error(w, "invalid post request", http.StatusBadRequest)
+	}
+
+	cmt := PostCommentRequestToComment(cmtRequest)
+	cmtPosted, err := h.Service.PostComment(r.Context(), cmt)
 	if err != nil {
 		log.Printf("Error while posting comment: %v", err)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(cmt); err != nil {
+	if err := json.NewEncoder(w).Encode(cmtPosted); err != nil {
 		log.Printf("Error while encoding to response: %v", err)
 		return
 	}
