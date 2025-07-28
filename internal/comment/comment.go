@@ -14,6 +14,9 @@ var (
 // Interface storing methods which repository implements
 type Store interface {
 	GetComment(context.Context, string) (Comment, error)
+	PostComment(context.Context, Comment) (Comment, error)
+	DeleteComment(context.Context, string) error
+	UpdateComment(context.Context, string, Comment) (Comment, error)
 }
 
 // Struct that will handle business logic
@@ -46,14 +49,30 @@ func (s *Service) GetComment(ctx context.Context, id string) (Comment, error) {
 	return comment, nil
 }
 
-func (s *Service) UpdateComment(ctx context.Context, comment Comment) error {
-	return ErrNotImplemented
+func (s *Service) UpdateComment(ctx context.Context, id string, comment Comment) (Comment, error) {
+	cmt, err := s.Store.UpdateComment(ctx, id, comment)
+	if err != nil {
+		println(err)
+		return Comment{}, err
+	}
+	return cmt, nil
 }
 
 func (s *Service) DeleteComment(ctx context.Context, id string) error {
-	return ErrNotImplemented
+	err := s.Store.DeleteComment(ctx, id)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return nil
 }
 
-func (s *Service) CreateComment(ctx context.Context, comment Comment) (Comment, error) {
-	return Comment{}, ErrNotImplemented
+func (s *Service) PostComment(ctx context.Context, comment Comment) (Comment, error) {
+	fmt.Println("posting comment")
+	comment, err := s.Store.PostComment(ctx, comment)
+	if err != nil {
+		fmt.Println(err)
+		return Comment{}, err
+	}
+	return comment, nil
 }
