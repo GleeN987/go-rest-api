@@ -32,6 +32,7 @@ func JWTAuth(original func(w http.ResponseWriter, r *http.Request)) func(w http.
 	}
 }
 
+// eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiaWF0IjoxNzUzNjk0MjA1LCJuYW1lIjoiSm9obiBEb2UiLCJzdWIiOiIxMjM0NTY3ODkwIn0.ukaw5zrKGtEknrfDtNAQmgpuznoPzP-xcTSZub1OOF4vv99E5S8w04SlC3YGSrmHL6zYwyG-sYJqt4ostNQFOg
 func validateToken(accessToken string) bool {
 	var signingKey = []byte("gorestapikey")
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
